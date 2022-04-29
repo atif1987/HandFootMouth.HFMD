@@ -1,0 +1,96 @@
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+
+
+data = pd.read_csv('Stat_Feature_Extracted.csv')
+data.head()
+
+X = data.drop('TARGET', axis =1)
+y = data['TARGET']
+
+X.shape, y.shape 
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+X_train.shape, X_test.shape 
+
+
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+
+# Step Forward selection 
+
+sfs = SFS(RandomForestClassifier(n_estimators=100, random_state=0, n_jobs=-1),
+          k_features=(1,10),
+          forward=True,
+          floating=False,
+          verbose=2,
+          scoring='accuracy',
+          cv = 5, 
+          n_jobs=-1,).fit(X, y)
+
+sfs.k_feature_names_
+sfs.k_feature_idx_
+sfs.k_score_
+sfsresult= pd.DataFrame.from_dict(sfs.get_metric_dict()).T
+sfsresult.to_excel("sfs.xlsx")
+
+#Forward selection with floating 
+
+sfs1 = SFS(RandomForestClassifier(n_estimators=100, random_state=0, n_jobs=-1),
+          k_features=(1,10),
+          forward=True,
+          floating=True,
+          verbose=2,
+          scoring='accuracy',
+          cv = 5, 
+          n_jobs=-1,).fit(X, y)
+
+sfs1.k_feature_names_
+sfs1.k_feature_idx_
+sfs1.k_score_
+sfs1result= pd.DataFrame.from_dict(sfs1.get_metric_dict()).T
+sfs1result.to_excel("sfs1.xlsx")
+# Step Backward selection 
+
+sfs2 = SFS(RandomForestClassifier(n_estimators=100, random_state=0, n_jobs=-1),
+          k_features=(1,10),
+          forward=False,
+          floating=False,
+          verbose=2,
+          scoring='accuracy',
+          cv = 5, 
+          n_jobs=-1,).fit(X, y)
+
+sfs2.k_feature_names_
+sfs2.k_feature_idx_
+sfs2.k_score_
+sfs2result= pd.DataFrame.from_dict(sfs2.get_metric_dict()).T
+sfs2result.to_excel("sfs2.xlsx")
+
+# Step Backward selection with floating
+
+sfs3 = SFS(RandomForestClassifier(n_estimators=100, random_state=0, n_jobs=-1),
+          k_features=(1,10),
+          forward=False,
+          floating=True,
+          verbose=2,
+          scoring='accuracy',
+          cv = 5, 
+          n_jobs=-1,).fit(X, y)
+
+sfs3.k_feature_names_
+sfs3.k_feature_idx_
+sfs3.k_score_
+sfs3result= pd.DataFrame.from_dict(sfs3.get_metric_dict()).T
+sfs3result.to_excel("sfs3.xlsx")
+
+
+
